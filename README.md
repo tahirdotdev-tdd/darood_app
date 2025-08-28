@@ -136,7 +136,7 @@ flutter pub get
 - Find the Supabase.initialize() block.
 - Replace the placeholder values with your actual Supabase URL and Anon Key from your project's API settings.
 
-```
+```dart
 // lib/main.dart
 
 Future<void> main() async {
@@ -152,7 +152,7 @@ Future<void> main() async {
 ```
 # **Configure Android & iOS Permissions**
 
-```
+```xml
 <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -161,7 +161,7 @@ Future<void> main() async {
 
 # **Run the app**
 
-```
+```bash
 flutter run
 ```
 
