@@ -106,9 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: passwordController,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      color: Colors.white, // 👈 toggle color
+                      color: Colors.white,
                     ),
-
                     cursorColor: Colors.orange,
                     obscureText: !showPassword,
                     decoration: InputDecoration(

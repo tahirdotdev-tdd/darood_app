@@ -43,7 +43,7 @@ class _MainLogInButtonState extends State<MainLogInButton> {
         // ignore: use_build_context_synchronously
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) =>  HomeScreen()),
         );
       }
     } on AuthException catch (e) {
