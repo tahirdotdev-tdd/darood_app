@@ -1,5 +1,6 @@
 // lib/screens/counter_page.dart
 
+import 'package:darood_app/styles/colors/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +50,7 @@ class _CounterPageState extends State<CounterPage> {
           style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF008080),
+        backgroundColor: mainBcg,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
@@ -57,7 +58,7 @@ class _CounterPageState extends State<CounterPage> {
           icon: const Icon(CupertinoIcons.back, color: Colors.white),
         ),
       ),
-      backgroundColor: const Color(0xFF008080),
+      backgroundColor: mainBcg,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -73,7 +74,13 @@ class _CounterPageState extends State<CounterPage> {
                     style: GoogleFonts.poppins(
                       fontSize: 180,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF333333),
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: Colors.orange.withOpacity(0.8),
+                          blurRadius: 20,
+                        ),
+                      ],
                     ),
                   );
                 }
@@ -93,7 +100,13 @@ class _CounterPageState extends State<CounterPage> {
                     style: GoogleFonts.poppins(
                       fontSize: 180,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF333333),
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          color: Colors.orange.withOpacity(0.8),
+                          blurRadius: 20,
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -114,7 +127,7 @@ class _CounterPageState extends State<CounterPage> {
                   height: 260,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.transparent,
+                    color: tileBcg,
                     border: Border.all(
                       color: Colors.orange.shade300,
                       width: 2.5,

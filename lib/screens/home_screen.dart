@@ -6,6 +6,7 @@ import 'package:darood_app/pages/counter_page.dart';
 import 'package:darood_app/pages/profile_page.dart';
 import 'package:darood_app/pages/settings_page.dart';
 import 'package:darood_app/screens/map_screen.dart';
+import 'package:darood_app/styles/colors/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
@@ -171,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       backdrop: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
         child: Container(
-          color: Colors.black.withOpacity(0.5),
+          color: Colors.grey.withOpacity(0.5),
         ),
       ),
       animationCurve: Curves.easeInOut,
@@ -183,7 +184,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           color: Colors.black87,
           child: ListTileTheme(
             textColor: Colors.white,
-            iconColor: Colors.black,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -212,14 +212,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ),
                 ListTile(
-                  leading: const Icon(CupertinoIcons.house_fill),
+                  leading: Icon(CupertinoIcons.house_fill,color: iconColor,),
                   title: Text('Home', style: GoogleFonts.poppins(fontSize: 16)),
                   onTap: () {
                     _advancedDrawerController.hideDrawer();
                   },
                 ),
                 ListTile(
-                  leading: const Icon(CupertinoIcons.profile_circled),
+                  leading: Icon(CupertinoIcons.profile_circled,color: iconColor,),
                   title: Text(
                     'Profile',
                     style: GoogleFonts.poppins(fontSize: 16),
@@ -229,15 +229,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(CupertinoIcons.map),
-                  title: const Text('Map'),
+                  leading:  Icon(CupertinoIcons.map,color: iconColor,),
+                  title:  Text('Map',style: GoogleFonts.poppins(fontSize: 16),),
                   onTap: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const MapScreen()));
                   },
                 ),
                 ListTile(
-                  leading: const Icon(CupertinoIcons.settings),
-                  title: const Text('Settings'),
+                  leading:  Icon(CupertinoIcons.settings,color: iconColor,),
+                  title:  Text('Settings',style: GoogleFonts.poppins(fontSize: 16),),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -253,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFFF1F1F1),
+        backgroundColor: mainBcg,
         appBar: AppBar(
           actions: [
             GestureDetector(
@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfilePage()));
                 },
-                icon: const Icon(CupertinoIcons.person_alt_circle,color: Colors.black,),
+                icon: const Icon(CupertinoIcons.person_alt_circle,color: Colors.white,),
               ),
             )
           ],
@@ -273,16 +273,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             "Home",
             style: GoogleFonts.poppins(
               fontSize: 14,
+              color: Colors.white,
               fontWeight: FontWeight.w600,
             ),
           ),
           centerTitle: true,
-          backgroundColor: const Color(0xFFF1F1F1),
+          backgroundColor: mainBcg,
           leading: IconButton(
             onPressed: () {
               _advancedDrawerController.showDrawer();
             },
-            icon: const Icon(CupertinoIcons.bars,color: Colors.black,),
+            icon: const Icon(CupertinoIcons.bars,color: Colors.white,),
           ),
         ),
         body: Center(
@@ -302,7 +303,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       height: 150,
                       width: 150,
                       decoration: BoxDecoration(
-                          color: Colors.orange,
+                          color: tileBcg,
+                          border: Border.all(color: Colors.grey.shade700),
                           borderRadius: BorderRadius.circular(20)),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -310,12 +312,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Icon(
                             CupertinoIcons.map_fill,
                             size: 50,
-                            color: Colors.white,
+                            color: iconColor,
                           ),
                           const SizedBox(height: 10),
                           Text(
                             "Map",
-                            style: GoogleFonts.poppins(fontSize: 20),
+                            style: GoogleFonts.poppins(
+                                fontSize: 20,
+                            color: Colors.white,
+                              fontWeight: FontWeight.w600
+                            ),
                           )
                         ],
                       ),
@@ -331,7 +337,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       height: 150,
                       width: 150,
                       decoration: BoxDecoration(
-                          color: Colors.orange,
+                          color: tileBcg,
+                          border: Border.all(color: Colors.grey.shade700),
                           borderRadius: BorderRadius.circular(20)),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -339,12 +346,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Icon(
                             CupertinoIcons.settings,
                             size: 50,
-                            color: Colors.white,
+                            color: iconColor,
                           ),
                           const SizedBox(height: 10),
                           Text(
                             "Settings",
-                            style: GoogleFonts.poppins(fontSize: 20),
+                            style: GoogleFonts.poppins(fontSize: 20,color: Colors.white,
+                                fontWeight: FontWeight.w600),
                           )
                         ],
                       ),
@@ -362,7 +370,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   height: 150,
                   width: 330,
                   decoration: BoxDecoration(
-                      color: Colors.orange,
+                      color: tileBcg,
+                      border: Border.all(color: Colors.grey.shade700),
                       borderRadius: BorderRadius.circular(20)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -370,12 +379,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Icon(
                         CupertinoIcons.add_circled_solid,
                         size: 50,
-                        color: Colors.white,
+                        color: iconColor,
                       ),
                       const SizedBox(height: 10),
                       Text(
                         "Counter",
-                        style: GoogleFonts.poppins(fontSize: 20),
+                        style: GoogleFonts.poppins(fontSize: 20,color: Colors.white,
+                            fontWeight: FontWeight.w600),
                       )
                     ],
                   ),

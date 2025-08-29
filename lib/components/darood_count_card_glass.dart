@@ -21,12 +21,9 @@ class DaroodCountCardGlass extends StatelessWidget {
           height: 300,
           width: 330,
           decoration: BoxDecoration(
-            color: Colors.orange,
+            color: const Color(0xFF1E1E1E),
             borderRadius: BorderRadius.circular(25),
-            border: Border.all(
-              color: Colors.grey,
-              width: 1.5,
-            ),
+            border: Border.all(color: Colors.grey.shade700),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -35,8 +32,8 @@ class DaroodCountCardGlass extends StatelessWidget {
                 "Total Darood Recited",
                 style: GoogleFonts.poppins(
                   fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 5),
@@ -48,7 +45,7 @@ class DaroodCountCardGlass extends StatelessWidget {
                   color: Colors.white,
                   shadows: [
                     Shadow(
-                      color: Colors.black.withOpacity(0.8),
+                      color: Colors.orange.withOpacity(0.8),
                       blurRadius: 20,
                     ),
                   ],

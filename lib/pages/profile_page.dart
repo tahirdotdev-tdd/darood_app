@@ -1,9 +1,12 @@
 // lib/screens/profile_page.dart
 
+import 'package:darood_app/styles/colors/colors.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:darood_app/main.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'; // To access the global 'supabase' client
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -17,11 +20,12 @@ class _ProfilePageState extends State<ProfilePage> {
   final _fullNameController = TextEditingController();
   String? _avatarUrl;
   bool _isLoading = true;
+  final Color primaryOrange = Colors.orange; // Define color for reuse
 
   @override
   void initState() {
     super.initState();
-    _getProfile(); // Fetch profile data when the screen loads
+    _getProfile();
   }
 
   @override
@@ -31,7 +35,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
-  // Fetches the current user's profile from the 'profiles' table
+  // --- LOGIC (UNCHANGED) ---
   Future<void> _getProfile() async {
     setState(() => _isLoading = true);
     try {
@@ -55,7 +59,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // Updates the user's profile in the 'profiles' table
   Future<void> _updateProfile() async {
     setState(() => _isLoading = true);
     final userName = _usernameController.text.trim();
@@ -86,7 +89,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  // Picks an image, uploads it to Supabase Storage, and updates the avatar URL
   Future<void> _uploadAvatar() async {
     final picker = ImagePicker();
     final imageFile = await picker.pickImage(
@@ -106,20 +108,16 @@ class _ProfilePageState extends State<ProfilePage> {
       final fileExt = imageFile.path.split('.').last;
       final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
       final userId = supabase.auth.currentUser!.id;
-      // The path where the image will be stored in the 'avatars' bucket
       final filePath = '$userId/$fileName';
 
-      // Upload image to Supabase Storage
       await supabase.storage.from('avatars').uploadBinary(
         filePath,
         bytes,
         fileOptions: FileOptions(contentType: imageFile.mimeType),
       );
 
-      // Get the public URL of the uploaded image
       final imageUrl = supabase.storage.from('avatars').getPublicUrl(filePath);
 
-      // Update the user's avatar_url in the profiles table
       await supabase.from('profiles').update({'avatar_url': imageUrl}).eq('id', userId);
 
       if(mounted) {
@@ -141,63 +139,132 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // --- UI (UPDATED) ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      backgroundColor: mainBcg,
+      appBar: AppBar(
+        backgroundColor: mainBcg,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(CupertinoIcons.back, color: Colors.white),
+        ),
+        title: Text(
+          "Edit Profile",
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        children: [
-          // Avatar Section
-          Center(
-            child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Avatar Section
+            Stack(
               children: [
                 CircleAvatar(
-                  radius: 60,
-                  backgroundImage: _avatarUrl != null ? NetworkImage(_avatarUrl!) : null,
-                  child: _avatarUrl == null ? const Icon(Icons.person, size: 60) : null,
+                  radius: 80, // Made the avatar larger
+                  backgroundColor: Colors.grey.shade300,
+                  backgroundImage: (_avatarUrl != null && _avatarUrl!.isNotEmpty)
+                      ? NetworkImage(_avatarUrl!)
+                      : null,
+                  child: (_avatarUrl == null || _avatarUrl!.isEmpty)
+                      ? Icon(CupertinoIcons.person_fill, size: 80, color: Colors.grey.shade500)
+                      : null,
                 ),
                 Positioned(
                   bottom: 0,
-                  right: 0,
-                  child: IconButton(
-                    onPressed: _uploadAvatar,
-                    icon: const Icon(Icons.camera_alt),
-                    style: IconButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                        foregroundColor: Colors.white
+                  right: 4,
+                  child: CircleAvatar(
+                    backgroundColor: primaryOrange,
+                    radius: 22,
+                    child: IconButton(
+                      onPressed: _uploadAvatar,
+                      icon: const Icon(CupertinoIcons.camera_fill, color: Colors.white, size: 22),
                     ),
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 24),
-          // Form Fields
-          TextFormField(
-            controller: _usernameController,
-            decoration: const InputDecoration(labelText: 'Username'),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _fullNameController,
-            decoration: const InputDecoration(labelText: 'Full Name'),
-          ),
-          const SizedBox(height: 24),
-          // Update Button
-          ElevatedButton(
-            onPressed: _updateProfile,
-            child: const Text('Save Changes'),
-          ),
-          const SizedBox(height: 16),
-          // Sign Out Button
-          TextButton(
-            onPressed: () => supabase.auth.signOut(),
-            child: const Text('Sign Out'),
-          )
-        ],
+            const SizedBox(height: 30),
+
+            // Form Fields in a Card
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+              decoration: BoxDecoration(
+                color: tileBcg,
+                border: Border.all(color: Colors.grey.shade700),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  TextFormField(
+                    style: GoogleFonts.poppins(color: Colors.orange),
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelStyle: GoogleFonts.poppins(color: Colors.white),
+                      labelText: 'Username',
+                      border: OutlineInputBorder(
+                        borderRadius:BorderRadius.circular(30)
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    style: GoogleFonts.poppins(color: Colors.orange),
+                    controller: _fullNameController,
+                    decoration:  InputDecoration(
+                      labelText: 'Full Name',
+                      labelStyle: GoogleFonts.poppins(color: Colors.white),
+                      border: OutlineInputBorder(
+                          borderRadius:BorderRadius.circular(30)
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+
+            // Update Button
+            ElevatedButton.icon(
+              onPressed: _updateProfile,
+              icon: const Icon(Icons.save, color: Colors.white),
+              label: Text(
+                "Save Changes",
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryOrange,
+                minimumSize: const Size(double.infinity, 55), // Make button wide
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

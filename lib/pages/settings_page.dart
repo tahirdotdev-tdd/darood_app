@@ -1,4 +1,5 @@
 import 'package:darood_app/pages/profile_page.dart';
+import 'package:darood_app/styles/colors/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,20 +37,20 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF008080),
+      backgroundColor: mainBcg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF008080),
+        backgroundColor: mainBcg,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(CupertinoIcons.back, color: Colors.black),
+          icon: const Icon(CupertinoIcons.back, color: Colors.white),
         ),
         title: Text(
           "Settings",
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
@@ -69,26 +70,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ]),
             const SizedBox(height: 20),
-            _buildSectionHeader("Preferences"),
-            const SizedBox(height: 10),
-            _buildSettingsCard([
-              SwitchListTile(
-                secondary: Icon(CupertinoIcons.moon_fill, color: primaryOrange),
-                title: const Text("Dark Mode"),
-                value: isDarkMode,
-                onChanged: (val) {
-                  setState(() => isDarkMode = val);
-                },
-                activeColor: primaryOrange,
-              ),
-              const Divider(height: 1, indent: 16, endIndent: 16),
-              _buildSettingsTile(
-                icon: CupertinoIcons.bell_fill,
-                title: "Notifications",
-                onTap: () {},
-              ),
-            ]),
-            const SizedBox(height: 20),
             _buildSectionHeader("Security & Privacy"),
             const SizedBox(height: 10),
             _buildSettingsCard([
@@ -101,6 +82,12 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildSettingsTile(
                 icon: CupertinoIcons.doc_text_fill,
                 title: "Privacy Policy",
+                onTap: () {},
+              ),
+              const Divider(height: 1, indent: 16, endIndent: 16),
+              _buildSettingsTile(
+                icon: CupertinoIcons.mail_solid,
+                title: "Feedback",
                 onTap: () {},
               ),
             ]),
@@ -140,7 +127,13 @@ class _SettingsPageState extends State<SettingsPage> {
       style: GoogleFonts.poppins(
         fontSize: 16,
         fontWeight: FontWeight.bold,
-        color: Colors.grey[800],
+        color: Colors.white,
+        shadows: [
+          Shadow(
+            color: Colors.orange.withOpacity(0.8),
+            blurRadius: 20,
+          ),
+        ],
       ),
     );
   }
@@ -149,7 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildSettingsCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: tileBcg,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -179,7 +172,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }) {
     return ListTile(
       leading: Icon(icon, color: primaryOrange),
-      title: Text(title),
+      title: Text(title,style: GoogleFonts.poppins(color: Colors.white),),
       trailing: const Icon(CupertinoIcons.right_chevron, size: 16, color: Colors.grey),
       onTap: onTap,
     );
