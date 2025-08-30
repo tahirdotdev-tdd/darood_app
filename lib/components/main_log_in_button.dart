@@ -43,7 +43,7 @@ class _MainLogInButtonState extends State<MainLogInButton> {
         // ignore: use_build_context_synchronously
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>  HomeScreen()),
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       }
     } on AuthException catch (e) {
@@ -77,7 +77,7 @@ class _MainLogInButtonState extends State<MainLogInButton> {
             : Text(
                 widget.text,
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: Colors.orange,
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),

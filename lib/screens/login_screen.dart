@@ -1,3 +1,5 @@
+// lib/screens/login_screen.dart
+
 import 'package:darood_app/components/main_log_in_button.dart';
 import 'package:darood_app/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
@@ -16,14 +18,40 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool showPassword = false;
+
+  // ===== THE FIX - PART 1: Declare the controllers here =====
+  // We declare the controllers as final instance variables of the State class.
+  // "late final" means they will be initialized once and will not change.
+  late final TextEditingController emailController;
+  late final TextEditingController passwordController;
+
+  // ===== THE FIX - PART 2: Initialize controllers in initState =====
+  // initState is called only ONCE when the widget is first created.
+  // This is the perfect place to create controllers to preserve their state.
+  @override
+  void initState() {
+    super.initState();
+    emailController = TextEditingController(text: widget.email ?? '');
+    passwordController = TextEditingController(text: widget.password ?? '');
+  }
+
+  // ===== THE FIX - PART 3: Dispose of controllers to prevent memory leaks =====
+  // dispose() is called when the widget is permanently removed from the screen.
+  // It's crucial to clean up controllers here.
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController(text: widget.email ?? '');
-    final passwordController = TextEditingController(
-      text: widget.password ?? '',
-    );
+    // ===== THE FIX - PART 4: Remove controller creation from the build method =====
+    // The controllers are now part of the widget's state and are reused on every rebuild.
 
     const Color accentColor = Colors.orange;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color(0xFF1C1C1C),
@@ -58,10 +86,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: Colors.orange,
                     ),
                   ),
-
                   const SizedBox(height: 48),
 
-                  // Email Text Field
+                  // Email Text Field (no changes here)
                   TextField(
                     controller: emailController,
                     cursorColor: Colors.orange,
@@ -101,7 +128,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Password Text Field
+
+                  // Password Text Field (no changes here)
                   TextField(
                     controller: passwordController,
                     style: GoogleFonts.poppins(
@@ -155,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Sign Up Button
+                  // Log In Button (no changes here)
                   MainLogInButton(
                     text: "Login",
                     emailController: emailController,
@@ -163,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Login Redirect
+                  // Sign Up Redirect (no changes here)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

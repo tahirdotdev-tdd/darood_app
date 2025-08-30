@@ -24,13 +24,13 @@ class _SettingsPageState extends State<SettingsPage> {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const LoginScreen()),
-            (route) => false,
+        (route) => false,
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error signing out: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error signing out: $e")));
     }
   }
 
@@ -48,7 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(
           "Settings",
           style: GoogleFonts.poppins(
-            fontSize: 18,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -66,7 +66,14 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildSettingsTile(
                 icon: CupertinoIcons.person_fill,
                 title: "Profile",
-                onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfilePage()));},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfilePage(),
+                    ),
+                  );
+                },
               ),
             ]),
             const SizedBox(height: 20),
@@ -95,7 +102,10 @@ class _SettingsPageState extends State<SettingsPage> {
             Center(
               child: ElevatedButton.icon(
                 onPressed: () => _signOut(context),
-                icon: const Icon(CupertinoIcons.square_arrow_right, color: Colors.white),
+                icon: const Icon(
+                  CupertinoIcons.square_arrow_right,
+                  color: Colors.white,
+                ),
                 label: Text(
                   "Log Out",
                   style: GoogleFonts.poppins(
@@ -106,10 +116,13 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryOrange,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 15,
+                  ),
+                  minimumSize: const Size(double.infinity, 55),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
               ),
@@ -129,10 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
         fontWeight: FontWeight.bold,
         color: Colors.white,
         shadows: [
-          Shadow(
-            color: Colors.orange.withOpacity(0.8),
-            blurRadius: 20,
-          ),
+          Shadow(color: Colors.orange.withOpacity(0.8), blurRadius: 20),
         ],
       ),
     );
@@ -157,9 +167,7 @@ class _SettingsPageState extends State<SettingsPage> {
       // respect the rounded corners of the container.
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Column(
-          children: children,
-        ),
+        child: Column(children: children),
       ),
     );
   }
@@ -172,8 +180,12 @@ class _SettingsPageState extends State<SettingsPage> {
   }) {
     return ListTile(
       leading: Icon(icon, color: primaryOrange),
-      title: Text(title,style: GoogleFonts.poppins(color: Colors.white),),
-      trailing: const Icon(CupertinoIcons.right_chevron, size: 16, color: Colors.grey),
+      title: Text(title, style: GoogleFonts.poppins(color: Colors.white)),
+      trailing: const Icon(
+        CupertinoIcons.right_chevron,
+        size: 16,
+        color: Colors.grey,
+      ),
       onTap: onTap,
     );
   }

@@ -5,10 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 class DaroodCountCardGlass extends StatelessWidget {
   final int daroodCount;
 
-  const DaroodCountCardGlass({
-    super.key,
-    required this.daroodCount,
-  });
+  const DaroodCountCardGlass({super.key, required this.daroodCount});
 
   @override
   Widget build(BuildContext context) {

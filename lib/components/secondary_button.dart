@@ -32,7 +32,7 @@ class _SecondaryButtonState extends State<SecondaryButton> {
         child: Text(
           widget.text,
           style: GoogleFonts.poppins(
-            color: Colors.white,
+            color: Colors.orange,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),

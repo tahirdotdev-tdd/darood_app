@@ -32,19 +32,27 @@ class MainScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Welcome to\nDarood App",
+                  "Welcome to",
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green.shade300, // lighter shade for contrast
+                    color: Colors.orange, // lighter shade for contrast
                   ),
                 ),
-                SizedBox(height: 60,),
+                Text(
+                  "Darood App",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // lighter shade for contrast
+                  ),
+                ),
+                SizedBox(height: 60),
                 PrimaryButton(),
-                SizedBox(height: 10,),
-                SecondaryButton(text: "Login",),
-                SizedBox(height: 10,),
-                AnonButton()
+                SizedBox(height: 10),
+                SecondaryButton(text: "Login"),
+                SizedBox(height: 10),
+                AnonButton(),
               ],
             ),
           ),

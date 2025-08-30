@@ -1,5 +1,3 @@
-// lib/screens/counter_page.dart
-
 import 'package:darood_app/styles/colors/colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +13,9 @@ class CounterPage extends StatefulWidget {
 }
 
 class _CounterPageState extends State<CounterPage> {
-  // THE FIX: The stream now correctly expects a List of results.
   Stream<List<Map<String, dynamic>>>? _profileStream;
   bool _isPressed = false;
+  bool _isResetPressed = false;
 
   @override
   void initState() {
@@ -25,20 +23,26 @@ class _CounterPageState extends State<CounterPage> {
     _initializeProfileStream();
   }
 
-  // THE FIX: Removed the fragile ".map((maps) => maps.first)"
   void _initializeProfileStream() {
     final userId = supabase.auth.currentUser!.id;
     _profileStream = supabase
         .from('profiles')
         .stream(primaryKey: ['id'])
-        .eq('id', userId); // This correctly returns a Stream<List<Map>>
+        .eq('id', userId);
   }
 
   void _incrementCounter() async {
-    await supabase.rpc('increment_darood_count', params: {
-      'user_id': supabase.auth.currentUser!.id,
-      'increment_value': 1,
-    });
+    await supabase.rpc(
+      'increment_darood_count',
+      params: {'user_id': supabase.auth.currentUser!.id, 'increment_value': 1},
+    );
+  }
+
+  void _resetCounter() async {
+    await supabase.rpc(
+      'reset_darood_count',
+      params: {'user_id': supabase.auth.currentUser!.id},
+    );
   }
 
   @override
@@ -47,7 +51,11 @@ class _CounterPageState extends State<CounterPage> {
       appBar: AppBar(
         title: Text(
           "Counter",
-          style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
         centerTitle: true,
         backgroundColor: mainBcg,
@@ -63,14 +71,12 @@ class _CounterPageState extends State<CounterPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // THE FIX: The StreamBuilder now handles a List and checks it safely.
             StreamBuilder<List<Map<String, dynamic>>>(
               stream: _profileStream,
               builder: (context, snapshot) {
-                // Safely handle loading and empty states
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Text(
-                    '0', // Show 0 if there's no data yet or the list is empty
+                    '0',
                     style: GoogleFonts.poppins(
                       fontSize: 180,
                       fontWeight: FontWeight.w700,
@@ -85,15 +91,15 @@ class _CounterPageState extends State<CounterPage> {
                   );
                 }
 
-                // If we have data, get the count from the first item in the list
                 final profileData = snapshot.data!.first;
                 final count = profileData['darood_count'] ?? 0;
 
                 return AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (Widget child, Animation<double> animation) {
-                    return ScaleTransition(scale: animation, child: child);
-                  },
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                        return ScaleTransition(scale: animation, child: child);
+                      },
                   child: Text(
                     '$count',
                     key: ValueKey<int>(count),
@@ -112,47 +118,91 @@ class _CounterPageState extends State<CounterPage> {
                 );
               },
             ),
-            GestureDetector(
-              onTapDown: (_) => setState(() => _isPressed = true),
-              onTapUp: (_) {
-                setState(() => _isPressed = false);
-                _incrementCounter();
-              },
-              onTapCancel: () => setState(() => _isPressed = false),
-              child: AnimatedScale(
-                scale: _isPressed ? 0.95 : 1.0,
-                duration: const Duration(milliseconds: 150),
-                child: Container(
-                  width: 260,
-                  height: 260,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: tileBcg,
-                    border: Border.all(
-                      color: Colors.orange.shade300,
-                      width: 2.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.orange.withOpacity(0.1),
-                        spreadRadius: 5,
-                        blurRadius: 20,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTapDown: (_) => setState(() => _isPressed = true),
+                  onTapUp: (_) {
+                    setState(() => _isPressed = false);
+                    _incrementCounter();
+                  },
+                  onTapCancel: () => setState(() => _isPressed = false),
+                  child: AnimatedScale(
+                    scale: _isPressed ? 0.95 : 1.0,
+                    duration: const Duration(milliseconds: 150),
+                    child: Container(
+                      width: 190,
+                      height: 190,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: tileBcg,
+                        border: Border.all(
+                          color: Colors.orange.shade300,
+                          width: 2.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.orange.withOpacity(0.1),
+                            spreadRadius: 5,
+                            blurRadius: 20,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      '+1',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        color: Colors.orange.shade800,
-                        fontSize: 74,
-                        fontWeight: FontWeight.w600,
+                      child: Center(
+                        child: Text(
+                          '+1',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            color: Colors.orange.shade800,
+                            fontSize: 74,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 40),
+                GestureDetector(
+                  onTapDown: (_) => setState(() => _isResetPressed = true),
+                  onTapUp: (_) {
+                    setState(() => _isResetPressed = false);
+                    _resetCounter();
+                  },
+                  onTapCancel: () => setState(() => _isResetPressed = false),
+                  child: AnimatedScale(
+                    scale: _isResetPressed ? 0.95 : 1.0,
+                    duration: const Duration(milliseconds: 150),
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.red[100],
+                        border: Border.all(
+                          color: Colors.redAccent.shade100,
+                          width: 2.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.08),
+                            spreadRadius: 4,
+                            blurRadius: 14,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.refresh,
+                          color: Colors.red[700],
+                          size: 44,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

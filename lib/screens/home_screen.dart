@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final _advancedDrawerController = AdvancedDrawerController();
   final GlobalKey _profileIconKey = GlobalKey();
 
-  // THE FIX: The stream now correctly expects a List of results.
+  // The stream will handle a List of results, which is safer.
   Stream<List<Map<String, dynamic>>>? _profileStream;
 
   OverlayEntry? _overlayEntry;
@@ -49,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  // THE FIX: Removed the fragile ".map((maps) => maps.first)"
   void _initializeProfileStream() {
     final userId = supabase.auth.currentUser!.id;
     _profileStream = supabase
@@ -64,9 +63,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  // ... (All other methods like _showDropdownMenu remain unchanged)
   void _showDropdownMenu() {
-    final RenderBox renderBox = _profileIconKey.currentContext!.findRenderObject() as RenderBox;
+    final RenderBox renderBox =
+        _profileIconKey.currentContext!.findRenderObject() as RenderBox;
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
 
@@ -94,7 +93,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           child: Container(
                             width: 180,
                             decoration: BoxDecoration(
-                              color: CupertinoColors.systemGrey6.withOpacity(0.8),
+                              color: CupertinoColors.systemGrey6.withOpacity(
+                                0.8,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -106,7 +107,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   text: 'Edit Profile',
                                   onTap: () {
                                     _hideDropdownMenu();
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfilePage()));
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const ProfilePage(),
+                                      ),
+                                    );
                                   },
                                 ),
                                 const Divider(height: 1),
@@ -145,7 +152,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  Widget _buildMenuItem(BuildContext context, {required IconData icon, required String text, required VoidCallback onTap, Color? color}) {
+  Widget _buildMenuItem(
+    BuildContext context, {
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+    Color? color,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -153,11 +166,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         color: Colors.transparent,
         child: Row(
           children: [
-            Icon(icon, color: color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87), size: 20),
+            Icon(
+              icon,
+              color:
+                  color ??
+                  (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black87),
+              size: 20,
+            ),
             const SizedBox(width: 12),
             Text(
               text,
-              style: GoogleFonts.poppins(fontSize: 15, color: color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87)),
+              style: GoogleFonts.poppins(
+                fontSize: 15,
+                color:
+                    color ??
+                    (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white
+                        : Colors.black87),
+              ),
             ),
           ],
         ),
@@ -171,9 +199,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       controller: _advancedDrawerController,
       backdrop: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-        child: Container(
-          color: Colors.grey.withOpacity(0.5),
-        ),
+        child: Container(color: Colors.black.withOpacity(0.5)),
       ),
       animationCurve: Curves.easeInOut,
       animationDuration: const Duration(milliseconds: 300),
@@ -184,60 +210,128 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           color: Colors.black87,
           child: ListTileTheme(
             textColor: Colors.white,
+            iconColor: Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Center(
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    margin: const EdgeInsets.only(top: 24, bottom: 24),
-                    clipBehavior: Clip.antiAlias,
-                    decoration: BoxDecoration(
-                      color: Colors.white12,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black54,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      CupertinoIcons.person_alt_circle,
-                      size: 60,
-                      color: Colors.white,
-                    ),
+                  child: StreamBuilder<List<Map<String, dynamic>>>(
+                    stream: _profileStream,
+                    builder: (context, snapshot) {
+                      // Safely get the avatar URL and username from the stream's data
+                      final hasData =
+                          snapshot.hasData && snapshot.data!.isNotEmpty;
+                      final avatarUrl = hasData
+                          ? snapshot.data!.first['avatar_url'] as String?
+                          : null;
+                      final username = hasData
+                          ? snapshot.data!.first['username'] as String?
+                          : null;
+
+                      return Column(
+                        children: [
+                          // This container is for the avatar
+                          Container(
+                            width: 100,
+                            height: 100,
+                            margin: const EdgeInsets.only(
+                              top: 24,
+                              bottom: 12,
+                            ), // Adjusted bottom margin
+                            clipBehavior: Clip.antiAlias,
+                            decoration: BoxDecoration(
+                              color: Colors.white12,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black54,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                              // Use NetworkImage if URL exists, otherwise it remains transparent
+                              image: (avatarUrl != null && avatarUrl.isNotEmpty)
+                                  ? DecorationImage(
+                                      image: NetworkImage(avatarUrl),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                            ),
+                            // Show an icon only if there is NO image
+                            child: (avatarUrl == null || avatarUrl.isEmpty)
+                                ? const Icon(
+                                    CupertinoIcons.person_alt_circle,
+                                    size: 60,
+                                    color: Colors.white70,
+                                  )
+                                : null,
+                          ),
+                          // This Text widget displays the username
+                          Text(
+                            username ??
+                                'User', // Display username, or 'User' as a fallback
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          // Add some space before the list tiles start
+                          const SizedBox(height: 24),
+                        ],
+                      );
+                    },
                   ),
                 ),
                 ListTile(
-                  leading: Icon(CupertinoIcons.house_fill,color: iconColor,),
+                  leading: const Icon(
+                    CupertinoIcons.house_fill,
+                    color: Colors.orange,
+                  ),
                   title: Text('Home', style: GoogleFonts.poppins(fontSize: 16)),
                   onTap: () {
                     _advancedDrawerController.hideDrawer();
                   },
                 ),
                 ListTile(
-                  leading: Icon(CupertinoIcons.profile_circled,color: iconColor,),
+                  leading: const Icon(
+                    CupertinoIcons.profile_circled,
+                    color: Colors.orange,
+                  ),
                   title: Text(
                     'Profile',
                     style: GoogleFonts.poppins(fontSize: 16),
                   ),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfilePage()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(),
+                      ),
+                    );
                   },
                 ),
                 ListTile(
-                  leading:  Icon(CupertinoIcons.map,color: iconColor,),
-                  title:  Text('Map',style: GoogleFonts.poppins(fontSize: 16),),
+                  leading: const Icon(CupertinoIcons.map, color: Colors.orange),
+                  title: Text('Map', style: GoogleFonts.poppins(fontSize: 16)),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const MapScreen()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MapScreen(),
+                      ),
+                    );
                   },
                 ),
                 ListTile(
-                  leading:  Icon(CupertinoIcons.settings,color: iconColor,),
-                  title:  Text('Settings',style: GoogleFonts.poppins(fontSize: 16),),
+                  leading: const Icon(
+                    CupertinoIcons.settings,
+                    color: Colors.orange,
+                  ),
+                  title: Text(
+                    'Settings',
+                    style: GoogleFonts.poppins(fontSize: 16),
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -256,18 +350,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         backgroundColor: mainBcg,
         appBar: AppBar(
           actions: [
-            GestureDetector(
-              key: _profileIconKey,
-              onLongPress: _showDropdownMenu,
-              child: IconButton(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfilePage()));
-                },
-                icon: const Icon(CupertinoIcons.person_alt_circle,color: Colors.white,),
-              ),
-            )
+            // The AppBar's avatar is also powered by the same stream
+            StreamBuilder<List<Map<String, dynamic>>>(
+              stream: _profileStream,
+              builder: (context, snapshot) {
+                final avatarUrl =
+                    (snapshot.hasData && snapshot.data!.isNotEmpty)
+                    ? snapshot.data!.first['avatar_url'] as String?
+                    : null;
+
+                return GestureDetector(
+                  key: _profileIconKey,
+                  onLongPress: _showDropdownMenu,
+                  child: IconButton(
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfilePage(),
+                        ),
+                      );
+                    },
+                    icon: (avatarUrl != null && avatarUrl.isNotEmpty)
+                        ? CircleAvatar(
+                            radius: 18,
+                            backgroundImage: NetworkImage(avatarUrl),
+                          )
+                        : const Icon(
+                            CupertinoIcons.person_alt_circle,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                  ),
+                );
+              },
+            ),
           ],
           title: Text(
             "Home",
@@ -283,7 +402,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             onPressed: () {
               _advancedDrawerController.showDrawer();
             },
-            icon: const Icon(CupertinoIcons.bars,color: Colors.white,),
+            icon: const Icon(CupertinoIcons.bars, color: Colors.white),
           ),
         ),
         body: Center(
@@ -295,7 +414,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MapScreen()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MapScreen(),
+                        ),
+                      );
                     },
                     child: Container(
                       margin: EdgeInsets.all(15),
@@ -303,33 +427,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       height: 150,
                       width: 150,
                       decoration: BoxDecoration(
-                          color: tileBcg,
-                          border: Border.all(color: Colors.grey.shade700),
-                          borderRadius: BorderRadius.circular(20)),
+                        color: tileBcg,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             CupertinoIcons.map_fill,
                             size: 50,
-                            color: iconColor,
+                            color: Colors.orange,
                           ),
                           const SizedBox(height: 10),
                           Text(
                             "Map",
                             style: GoogleFonts.poppins(
-                                fontSize: 20,
-                            color: Colors.white,
-                              fontWeight: FontWeight.w600
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsPage(),
+                        ),
+                      );
                     },
                     child: Container(
                       margin: EdgeInsets.all(15),
@@ -337,23 +466,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       height: 150,
                       width: 150,
                       decoration: BoxDecoration(
-                          color: tileBcg,
-                          border: Border.all(color: Colors.grey.shade700),
-                          borderRadius: BorderRadius.circular(20)),
+                        color: tileBcg,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
                             CupertinoIcons.settings,
                             size: 50,
-                            color: iconColor,
+                            color: Colors.orange,
                           ),
                           const SizedBox(height: 10),
                           Text(
                             "Settings",
-                            style: GoogleFonts.poppins(fontSize: 20,color: Colors.white,
-                                fontWeight: FontWeight.w600),
-                          )
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -362,7 +494,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const CounterPage()));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CounterPage(),
+                    ),
+                  );
                 },
                 child: Container(
                   margin: EdgeInsets.all(15),
@@ -370,37 +507,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   height: 150,
                   width: 330,
                   decoration: BoxDecoration(
-                      color: tileBcg,
-                      border: Border.all(color: Colors.grey.shade700),
-                      borderRadius: BorderRadius.circular(20)),
+                    color: tileBcg,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
                         CupertinoIcons.add_circled_solid,
                         size: 50,
-                        color: iconColor,
+                        color: Colors.orange,
                       ),
                       const SizedBox(height: 10),
                       Text(
                         "Counter",
-                        style: GoogleFonts.poppins(fontSize: 20,color: Colors.white,
-                            fontWeight: FontWeight.w600),
-                      )
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
-              // THE FIX: The StreamBuilder now handles a List and checks it safely.
               StreamBuilder<List<Map<String, dynamic>>>(
                 stream: _profileStream,
                 builder: (context, snapshot) {
-                  // Safely handle loading and empty states
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return DaroodCountCardGlass(daroodCount: 0);
                   }
 
-                  // If we have data, get the count from the first item in the list
                   final profileData = snapshot.data!.first;
                   final daroodCount = profileData['darood_count'] ?? 0;
                   return DaroodCountCardGlass(daroodCount: daroodCount);

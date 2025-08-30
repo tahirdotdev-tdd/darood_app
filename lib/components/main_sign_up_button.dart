@@ -82,7 +82,7 @@ class _MainSignUpButtonState extends State<MainSignUpButton> {
             : Text(
                 "Sign Up",
                 style: GoogleFonts.poppins(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),
