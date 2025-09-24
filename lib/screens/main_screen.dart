@@ -1,4 +1,3 @@
-import 'package:darood_app/components/anon_button.dart';
 import 'package:darood_app/components/primary_button.dart';
 import 'package:darood_app/components/secondary_button.dart';
 import 'package:flutter/material.dart';
@@ -51,8 +50,6 @@ class MainScreen extends StatelessWidget {
                 PrimaryButton(),
                 SizedBox(height: 10),
                 SecondaryButton(text: "Login"),
-                SizedBox(height: 10),
-                AnonButton(),
               ],
             ),
           ),
